@@ -1,22 +1,29 @@
 import hmac
 import hashlib
 import base64
-from urlparse import urlparse
 from email.utils import formatdate
 from . import utils
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 class Auth(object):
     def __init__(self, access_key, secret_key):
         self.ak = access_key
-        self.sk = secret_key
+        self.sk = secret_key.encode('UTF-8')
 
     def sign_request(self, req):
         req.headers['date'] = formatdate(None, usegmt=True)
         signature = self._do_sign(req)
+        signature = signature.decode('UTF-8')
         req.headers['authorization'] = 'Pandora {0}:{1}'.format(self.ak, signature)
 
     def _do_sign(self, req):
         string_to_sign = self._get_string_to_sign(req)
+        string_to_sign = string_to_sign.encode('UTF-8')
+
         h = hmac.new(self.sk, string_to_sign, hashlib.sha1)
         return base64.urlsafe_b64encode(h.digest())
 

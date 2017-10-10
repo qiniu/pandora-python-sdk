@@ -13,10 +13,16 @@ def to_point(fields):
     return '\t'.join('{0}={1}'.format(p[0], escape(str(to_bytes(p[1])))) for p in fields)
 
 def to_bytes(data):
-    if isinstance(data, unicode):
-        return data.encode('utf-8')
-    else:
-        return data
+    try:
+
+        if isinstance(data, unicode):
+            return data.encode('UTF-8')
+    except NameError:
+
+        if isinstance(data, bytes):
+            return data.encode('utf-8')
+
+    return data
 
 def escape(s):
     return s.replace('\r', '\\r').replace('\t', '\\t').replace('\n', '\\n').replace('\\', '\\\\')
